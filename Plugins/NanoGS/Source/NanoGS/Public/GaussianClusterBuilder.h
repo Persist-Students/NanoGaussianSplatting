@@ -53,7 +53,23 @@ public:
 	static bool BuildClusterHierarchy(
 		TArray<FGaussianSplatData>& InOutSplats,
 		FGaussianClusterHierarchy& OutHierarchy,
-		const FBuildSettings& Settings = FBuildSettings());
+		const FBuildSettings& Settings);
+
+	/**
+	 * Same, with default settings.
+	 *
+	 * Clang (Linux) rejects `= FBuildSettings()` as a default argument here: the nested
+	 * struct's default member initializers are not yet usable inside the enclosing class's
+	 * own declarations, so the defaulted constructor's exception specification cannot be
+	 * evaluated. MSVC accepts it. A member function *body* is parsed after the enclosing
+	 * class is complete, so routing the default through this overload builds on both.
+	 */
+	static bool BuildClusterHierarchy(
+		TArray<FGaussianSplatData>& InOutSplats,
+		FGaussianClusterHierarchy& OutHierarchy)
+	{
+		return BuildClusterHierarchy(InOutSplats, OutHierarchy, FBuildSettings());
+	}
 
 private:
 	/**
